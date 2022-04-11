@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PieceController : MonoBehaviour
 {
@@ -8,6 +6,7 @@ public class PieceController : MonoBehaviour
     public GameObject WhitePieces;
     public GameObject BlackPieces;
     public Sprite QueenSprite;
+    [SerializeField] private SoundManager soundManager;
 
     public float MoveSpeed = 20;
 
@@ -27,14 +26,12 @@ public class PieceController : MonoBehaviour
 
     private bool moved = false;
 
-    // Use this for initialization
     void Start()
     {
         if (GameController == null) GameController = FindObjectOfType<GameController>();
         if (this.name.Contains("Knight")) MoveSpeed *= 2;
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
         if (MovingY || MovingX)
@@ -64,6 +61,7 @@ public class PieceController : MonoBehaviour
         }
         else
         {
+            soundManager.DefineTypeFigure(name);
             if (GameController.SelectedPiece == null)
             {
                 GameController.SelectPiece(this.gameObject);
