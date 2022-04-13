@@ -2,23 +2,24 @@
 
 public class PieceController : MonoBehaviour
 {
-    public GameController GameController;
-    public GameObject WhitePieces;
-    public GameObject BlackPieces;
-    public Sprite QueenSprite;
+    [SerializeField] private GameController GameController;
+    [SerializeField] private GameObject WhitePieces;
+    [SerializeField] private GameObject BlackPieces;
+    [SerializeField] private Sprite QueenSprite;
+
     [SerializeField] private SoundManager soundManager;
+    [SerializeField] private RenameFigure renameFigure;
+    [SerializeField] private StatusOutputController status;
 
-    public float MoveSpeed = 20;
+    [SerializeField] private float MoveSpeed = 20;
 
-    public float HighestRankY = 3.5f;
-    public float LowestRankY = -3.5f;
+    [SerializeField] private float HighestRankY = 3.5f;
+    [SerializeField] private float LowestRankY = -3.5f;
 
-    [HideInInspector]
-    public bool DoubleStep = false;
-    [HideInInspector]
-    public bool MovingY = false;
-    [HideInInspector]
-    public bool MovingX = false;
+    [HideInInspector] public bool DoubleStep = false;
+
+    private bool MovingY = false;
+    private bool MovingX = false;
 
     private Vector3 oldPosition;
     private Vector3 newPositionY;
@@ -26,13 +27,13 @@ public class PieceController : MonoBehaviour
 
     private bool moved = false;
 
-    void Start()
+    private void Start()
     {
         if (GameController == null) GameController = FindObjectOfType<GameController>();
         if (this.name.Contains("Knight")) MoveSpeed *= 2;
     }
     
-    void Update()
+    private void Update()
     {
         if (MovingY || MovingX)
         {
@@ -83,7 +84,6 @@ public class PieceController : MonoBehaviour
     public bool MovePiece(Vector3 newPosition, bool castling = false)
     {
         GameObject encounteredEnemy = null;
-
         newPosition.z = this.transform.position.z;
         this.oldPosition = this.transform.position;
 
@@ -124,6 +124,11 @@ public class PieceController : MonoBehaviour
             this.newPositionX = newPosition;
             MovingY = true; // Start movement
 
+            if (encounteredEnemy != null) //If you cut down the figure, the method will pass the data to another script
+            {
+                renameFigure.Raname(gameObject.name, encounteredEnemy.name);
+                status.Output();
+            }
             Destroy(encounteredEnemy);
             return true;
         }
@@ -376,6 +381,7 @@ public class PieceController : MonoBehaviour
                     if (piece.GetComponent<PieceController>().ValidateMovement(piece.position, kingPosition, out encounteredEnemy, true))
                     {
                         Debug.Log("Black King is in check by: " + piece);
+                        status.OutputResultBlack();
                         isInCheck = true;
                         break;
                     }
@@ -393,6 +399,7 @@ public class PieceController : MonoBehaviour
                     if (piece.GetComponent<PieceController>().ValidateMovement(piece.position, kingPosition, out encounteredEnemy, true))
                     {
                         Debug.Log("White King is in check by: " + piece);
+                        status.OutputResultWhite();
                         isInCheck = true;
                         break;
                     }

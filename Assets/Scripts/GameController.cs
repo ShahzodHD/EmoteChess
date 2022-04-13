@@ -109,7 +109,7 @@ public class GameController : MonoBehaviour
         {
             if (pieceController.ValidateMovement(piece.transform.position, new Vector3(square.position.x, square.position.y, piece.transform.position.z), out encounteredEnemy))
             {
-                Debug.Log(piece + " on " + square);
+                //Debug.Log(piece + " on " + square);
                 return true;
             }
         }
